@@ -1,6 +1,6 @@
 // src/pages/login.tsx
-import { useState } from 'react'
-import { useRouter } from 'next/router'
+import {useState} from 'react'
+import {useRouter} from 'next/router'
 import {
     Box,
     Button,
@@ -8,24 +8,55 @@ import {
     TextField,
     Typography
 } from '@mui/material'
+import {jwtDecode} from 'jwt-decode'
+
+type LoginResponse = { token: string }
+type TokenClaims = {
+    sub: string
+    role: string
+    exp: number
+}
 
 export default function LoginPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const router = useRouter()
 
-    const handleLogin = () => {
-        if (username === 'admin' && password === 'admin') {
-            localStorage.setItem('auth', 'true')
+    const handleLogin = async () => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({username, password}),
+            })
+
+            if (!response.ok) {
+                alert('نام کاربری یا رمز اشتباه است')
+                return
+            }
+
+            const data: LoginResponse = await response.json()
+            const decoded: TokenClaims = jwtDecode(data.token)
+
+            // Save token and user info
+            localStorage.setItem('token', data.token)
+            localStorage.setItem('user', JSON.stringify({
+                email: decoded.sub,
+                role: decoded.role,
+            }))
+
             router.push('/admin')
-        } else {
-            alert('نام کاربری یا رمز عبور اشتباه است')
+        } catch (error) {
+            alert('خطا در ارتباط با سرور')
+            console.error(error)
         }
     }
 
     return (
-        <Box sx={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <Paper sx={{ p: 4, width: 300 }}>
+        <Box sx={{minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <Paper sx={{p: 4, width: 300}}>
                 <Typography variant="h6" gutterBottom>
                     ورود به پنل مدیریت
                 </Typography>
@@ -39,8 +70,8 @@ export default function LoginPage() {
                 <TextField
                     fullWidth
                     label="رمز عبور"
-                    margin="normal"
                     type="password"
+                    margin="normal"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
