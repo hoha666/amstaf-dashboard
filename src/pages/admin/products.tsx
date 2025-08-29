@@ -11,7 +11,7 @@ type User = {
     active: boolean
 }
 
-export default function UserManagement() {
+export default function ProductManagement() {
     const [users, setUsers] = useState<User[]>([
         { id: '1', name: 'Admin', role: 'admin', active: true },
         { id: '2', name: 'Alice', role: 'sales manager', active: true },
@@ -38,7 +38,7 @@ export default function UserManagement() {
         <RoleGuard roles={['Admin']}>
             <DashboardLayout>
                 <Typography variant="h5" gutterBottom>
-                    مدیریت کاربران
+                    مدیریت کالا
                 </Typography>
                 <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={() => setOpen(true)}>
                     اضافه کردن کاربر جدید

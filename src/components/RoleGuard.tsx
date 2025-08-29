@@ -1,24 +1,30 @@
-// components/RoleGuard.tsx
-import { useAuth } from '@/hooks/useAuth'
+import { ReactNode } from 'react'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useAuth } from '@/hooks/useAuth'
 
-type RoleGuardProps = {
-    roles: string | string[]
-    children: React.ReactNode
+type Props = {
+    roles: string[]
+    children: ReactNode
 }
 
-export default function RoleGuard({ roles, children }: RoleGuardProps) {
-    const { user, hasRole } = useAuth()
+export default function RoleGuard({ roles, children }: Props) {
+    const { user, hasRole, loading } = useAuth()
     const router = useRouter()
 
-    useEffect(() => {
-        if (user && !hasRole(roles)) {
-            router.replace('/unauthorized') // or '/' depending on your UX
-        }
-    }, [user])
+    // Show nothing while loading
+    if (loading) return null
 
-    if (!user) return null // or loading spinner
+    // Not logged in
+    if (!user) {
+        if (typeof window !== 'undefined') router.replace('/login')
+        return null
+    }
 
-    return hasRole(roles) ? <>{children}</> : null
+    // Logged in but no allowed role
+    if (!hasRole(roles)) {
+        if (typeof window !== 'undefined') router.replace('/unauthorized')
+        return null
+    }
+
+    return <>{children}</>
 }

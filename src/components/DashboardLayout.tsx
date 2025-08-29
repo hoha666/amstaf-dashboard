@@ -1,5 +1,4 @@
-// src/components/DashboardLayout.tsx
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Box, List, ListItemButton, ListItemText, Typography, IconButton } from '@mui/material'
 import LogoutIcon from '@mui/icons-material/Logout'
@@ -8,30 +7,36 @@ import { useAuth } from '@/hooks/useAuth'
 type Props = { children: ReactNode }
 
 export default function DashboardLayout({ children }: Props) {
-    const { user, logout } = useAuth()
+    const { user, isAuthenticated, logout, loading } = useAuth()
     const router = useRouter()
 
+    // Redirect if logged out
+    useEffect(() => {
+        if (!loading && !isAuthenticated) {
+            router.replace('/login')
+        }
+    }, [loading, isAuthenticated, router])
+
     const menuItems = [
-        { label: 'Dashboard', path: '/admin' },
-        ...(user?.role === 'Admin' ? [{ label: 'User Management', path: '/admin/users' }] : []),
-        // Add more role-specific links here
+        { label: 'داشبورد', path: '/admin' },
+        ...(user?.role === 'Admin' ? [{ label: 'مدیریت کاربران', path: '/admin/users' }] : []),
+        ...(user?.role === 'Admin' ? [{ label: 'مدیریت کالا', path: '/admin/products' }] : []),
     ]
 
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-            {/* Sidebar */}
+            {/* Sidebar always renders */}
             <Box
                 component="nav"
                 sx={{
-                    width: 200,
-                    bgcolor: 'background.paper',
+                    width: 250,
+                    bgcolor: (theme) => theme.palette.grey[100],
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     p: 2,
                 }}
             >
-                {/* Menu items */}
                 <List>
                     {menuItems.map((item) => (
                         <ListItemButton
@@ -44,12 +49,17 @@ export default function DashboardLayout({ children }: Props) {
                     ))}
                 </List>
 
-                {/* Bottom fixed box with username and logout */}
                 {user && (
-                    <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #ccc' }}>
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                            {user.email}
-                        </Typography>
+                    <Box
+                        sx={{
+                            mt: 2,
+                            pt: 2,
+                            borderTop: '1px solid #ccc',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between', // logout left, username right
+                        }}
+                    >
                         <IconButton
                             size="small"
                             color="primary"
@@ -60,13 +70,15 @@ export default function DashboardLayout({ children }: Props) {
                         >
                             <LogoutIcon />
                         </IconButton>
+                        <Typography variant="body2">{user.email}</Typography>
                     </Box>
                 )}
+
             </Box>
 
-            {/* Main content */}
+            {/* Main content: only render if authorized */}
             <Box component="main" sx={{ flex: 1, p: 3 }}>
-                {children}
+                {loading ? <div>Loading...</div> : isAuthenticated ? children : null}
             </Box>
         </Box>
     )
