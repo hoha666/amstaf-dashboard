@@ -28,16 +28,22 @@ export default function ProductMediaPage() {
     const [error, setError] = useState<string | null>(null);
     const [openError, setOpenError] = useState(false);
 
+    // New state: which image is selected for preview
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
     const errorToMessage = (err: unknown): string =>
         err instanceof Error ? err.message : "خطای ناشناخته رخ داد";
 
-    // Load product with media
     const load = async () => {
         if (!id || Array.isArray(id)) return;
         try {
             setLoading(true);
-            const data = await getProductById(id); // <- Product service returns product + media
+            const data = await getProductById(id as string);
             setProduct(data);
+            // Default preview = first image
+            if (data.media && data.media.length > 0) {
+                setSelectedImage(data.media[0].url);
+            }
         } catch (err: unknown) {
             setError(errorToMessage(err));
             setOpenError(true);
@@ -55,9 +61,9 @@ export default function ProductMediaPage() {
         const file = e.target.files?.[0];
         if (!file) return;
         try {
-            await addMediaToProduct(id, file); // one image per call
-            await load(); // refresh product
-            e.target.value = ""; // reset input
+            await addMediaToProduct(id as string, file);
+            await load();
+            e.target.value = "";
         } catch (err: unknown) {
             setError(errorToMessage(err));
             setOpenError(true);
@@ -67,8 +73,8 @@ export default function ProductMediaPage() {
     const handleDelete = async (url: string) => {
         if (!id || Array.isArray(id)) return;
         try {
-            await deleteMediaFromProduct(id, url);
-            await load(); // refresh
+            await deleteMediaFromProduct(id as string, url);
+            await load();
         } catch (err: unknown) {
             setError(errorToMessage(err));
             setOpenError(true);
@@ -84,7 +90,7 @@ export default function ProductMediaPage() {
                     <Typography>محصول پیدا نشد</Typography>
                 ) : (
                     <Box>
-                        {/* Header row with product name + upload */}
+                        {/* Header */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -105,44 +111,89 @@ export default function ProductMediaPage() {
                             </Button>
                         </Box>
 
-                        {/* Media gallery */}
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                            {product.media && product.media.length > 0 ? (
-                                product.media.map((m, idx) => (
-                                    <Paper
-                                        key={idx}
-                                        sx={{
-                                            p: 1,
-                                            width: 160,
-                                            textAlign: "center",
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <img
-                                            src={m.url}
-                                            alt="media"
-                                            style={{
-                                                width: "100%",
-                                                height: 120,
-                                                objectFit: "cover",
-                                                borderRadius: 6,
+                        {/* Two column layout */}
+                        <Box sx={{ display: "flex", gap: 3 }}>
+                            {/* Left section = thumbnails */}
+                            <Box
+                                sx={{
+                                    flex: 1,
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: 2,
+                                    alignContent: "flex-start",
+                                }}
+                            >
+                                {product.media && product.media.length > 0 ? (
+                                    product.media.map((m, idx) => (
+                                        <Paper
+                                            key={idx}
+                                            sx={{
+                                                p: 1,
+                                                width: 120,
+                                                textAlign: "center",
+                                                cursor: "pointer",
+                                                border:
+                                                    selectedImage === m.url
+                                                        ? "2px solid #1976d2"
+                                                        : "1px solid #ddd",
                                             }}
-                                        />
-                                        <IconButton
-                                            size="small"
-                                            color="error"
-                                            onClick={() => handleDelete(m.url)}
-                                            sx={{ mt: 1 }}
+                                            onClick={() => setSelectedImage(m.url)}
                                         >
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Paper>
-                                ))
-                            ) : (
-                                <Typography>هیچ تصویری بارگذاری نشده است</Typography>
-                            )}
+                                            <img
+                                                src={m.url}
+                                                alt="media"
+                                                style={{
+                                                    width: "100%",
+                                                    height: 80,
+                                                    objectFit: "cover",
+                                                    borderRadius: 6,
+                                                }}
+                                            />
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // prevent triggering preview select
+                                                    handleDelete(m.url);
+                                                }}
+                                                sx={{ mt: 1 }}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        </Paper>
+                                    ))
+                                ) : (
+                                    <Typography>هیچ تصویری بارگذاری نشده است</Typography>
+                                )}
+                            </Box>
+
+                            {/* Right section = preview */}
+                            <Box
+                                sx={{
+                                    flex: 2,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    border: "1px solid #ddd",
+                                    borderRadius: 2,
+                                    minHeight: 300,
+                                    p: 2,
+                                }}
+                            >
+                                {selectedImage ? (
+                                    <img
+                                        src={selectedImage}
+                                        alt="selected"
+                                        style={{
+                                            maxWidth: "100%",
+                                            maxHeight: "100%",
+                                            objectFit: "contain",
+                                        }}
+                                    />
+                                ) : (
+                                    <Typography>تصویری برای پیش‌نمایش انتخاب نشده است</Typography>
+                                )}
+                            </Box>
                         </Box>
                     </Box>
                 )}
