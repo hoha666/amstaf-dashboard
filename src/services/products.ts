@@ -76,3 +76,7 @@ export const deleteMediaFromProduct = async (id: string, mediaUrl: string): Prom
     });
 };
 
+export const duplicateProduct = async (id: string): Promise<Product> => {
+    const res = await api.post<Product>(`/products/${id}/duplicate`);
+    return res.data;
+};

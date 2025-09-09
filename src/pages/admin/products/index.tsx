@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import DashboardLayout from "@/components/DashboardLayout";
 import RoleGuard from "@/components/RoleGuard";
-import {deleteProduct, getProducts, Product} from "@/services/products";
+import {duplicateProduct, deleteProduct, getProducts, Product} from "@/services/products";
 import { useRouter } from "next/router";
 
 export default function ProductsPage() {
@@ -122,6 +122,23 @@ export default function ProductsPage() {
                                                 onClick={() => router.push(`/admin/products/${p.id}/edit`)}
                                             >
                                                 ویرایش
+                                            </Button>
+
+                                            <Button
+                                                size="small"
+                                                sx={{ ml: 1 }}
+                                                variant="outlined"
+                                                onClick={async () => {
+                                                    try {
+                                                        const clone = await duplicateProduct(p.id);
+                                                        // Add the new clone to UI (prepend to keep it visible)
+                                                        setProducts((prev) => [clone, ...prev]);
+                                                    } catch {
+                                                        alert("خطا در کپی کردن محصول");
+                                                    }
+                                                }}
+                                            >
+                                                کپی
                                             </Button>
 
                                             <Button
