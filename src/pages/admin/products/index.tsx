@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import DashboardLayout from "@/components/DashboardLayout";
 import RoleGuard from "@/components/RoleGuard";
-import { getProducts, Product } from "@/services/products";
+import {deleteProduct, getProducts, Product} from "@/services/products";
 import { useRouter } from "next/router";
 
 export default function ProductsPage() {
@@ -114,7 +114,35 @@ export default function ProductsPage() {
                                             >
                                                 مدیریت تصاویر
                                             </Button>
+
+                                            <Button
+                                                size="small"
+                                                sx={{ ml: 1 }}
+                                                variant="outlined"
+                                                onClick={() => router.push(`/admin/products/${p.id}/edit`)}
+                                            >
+                                                ویرایش
+                                            </Button>
+
+                                            <Button
+                                                size="small"
+                                                color="error"
+                                                sx={{ ml: 1 }}
+                                                onClick={async () => {
+                                                    if (confirm(`آیا مطمئن هستید که می‌خواهید "${p.name}" را حذف کنید؟`)) {
+                                                        try {
+                                                            await deleteProduct(p.id);
+                                                            setProducts(products.filter((prod) => prod.id !== p.id));
+                                                        } catch (err) {
+                                                            alert("خطا در حذف محصول");
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                حذف
+                                            </Button>
                                         </TableCell>
+
                                     </TableRow>
                                 ))}
                             </TableBody>

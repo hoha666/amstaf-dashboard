@@ -12,7 +12,7 @@ export interface ProductMedia {
 
 // Full product type (as returned by backend)
 export interface Product {
-    id: number;
+    id: string;
     name: string;
     price: number;
     stock: number;
@@ -46,7 +46,7 @@ export const createProduct = async (product: CreateProductDTO): Promise<Product>
 
 // Update product
 export const updateProduct = async (
-    id: number,
+    id: string,
     product: Partial<CreateProductDTO>
 ): Promise<Product> => {
     const response = await api.put<Product>(`/products/${id}`, product);
@@ -54,7 +54,7 @@ export const updateProduct = async (
 };
 
 // Delete product
-export const deleteProduct = async (id: number): Promise<void> => {
+export const deleteProduct = async (id: string): Promise<void> => {
     await api.delete(`/products/${id}`);
 };
 

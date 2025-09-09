@@ -9,6 +9,7 @@ import {
     Paper,
     IconButton,
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DashboardLayout from "@/components/DashboardLayout";
 import RoleGuard from "@/components/RoleGuard";
@@ -27,8 +28,6 @@ export default function ProductMediaPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [openError, setOpenError] = useState(false);
-
-    // New state: which image is selected for preview
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     const errorToMessage = (err: unknown): string =>
@@ -40,7 +39,6 @@ export default function ProductMediaPage() {
             setLoading(true);
             const data = await getProductById(id as string);
             setProduct(data);
-            // Default preview = first image
             if (data.media && data.media.length > 0) {
                 setSelectedImage(data.media[0].url);
             }
@@ -90,7 +88,7 @@ export default function ProductMediaPage() {
                     <Typography>محصول پیدا نشد</Typography>
                 ) : (
                     <Box>
-                        {/* Header */}
+                        {/* Header with back + title + upload */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -99,7 +97,16 @@ export default function ProductMediaPage() {
                                 mb: 3,
                             }}
                         >
-                            <Typography variant="h5">{product.name}</Typography>
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                <Button
+                                    variant="outlined"
+                                    startIcon={<ArrowBackIcon />}
+                                    onClick={() => router.back()}
+                                >
+                                    بازگشت
+                                </Button>
+                                <Typography variant="h5">{product.name}</Typography>
+                            </Box>
                             <Button variant="contained" component="label">
                                 بارگذاری تصویر جدید
                                 <input
@@ -111,9 +118,9 @@ export default function ProductMediaPage() {
                             </Button>
                         </Box>
 
-                        {/* Two column layout */}
+                        {/* Two-column layout */}
                         <Box sx={{ display: "flex", gap: 3 }}>
-                            {/* Left section = thumbnails */}
+                            {/* Thumbnails */}
                             <Box
                                 sx={{
                                     flex: 1,
@@ -153,7 +160,7 @@ export default function ProductMediaPage() {
                                                 size="small"
                                                 color="error"
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); // prevent triggering preview select
+                                                    e.stopPropagation();
                                                     handleDelete(m.url);
                                                 }}
                                                 sx={{ mt: 1 }}
@@ -167,7 +174,7 @@ export default function ProductMediaPage() {
                                 )}
                             </Box>
 
-                            {/* Right section = preview */}
+                            {/* Preview */}
                             <Box
                                 sx={{
                                     flex: 2,
