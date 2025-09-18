@@ -24,6 +24,7 @@ export type SaleEntity = {
     price: number;
     stock: number;
     size: string;
+    isPublished: boolean;
     createdAt: string;
     updatedAt?: string | null;
 };
@@ -56,6 +57,7 @@ export type SaleEntityQuery = {
     sortDir?: "asc" | "desc";
     page?: number;
     pageSize?: number;
+    published?: boolean;
 };
 
 // ---------------- SaleItems (root) ----------------
