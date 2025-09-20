@@ -19,8 +19,8 @@ export default function DashboardLayout({ children }: Props) {
 
     const menuItems = [
         { label: 'داشبورد', path: '/admin' },
-        ...(user?.role === 'Admin' ? [{ label: 'مدیریت کاربران', path: '/admin/users' }] : []),
-        ...(user?.role === 'Admin' ? [{ label: 'مدیریت کالا', path: '/admin/products' }] : []),
+        // ...(user?.role === 'Admin' ? [{ label: 'مدیریت کاربران', path: '/admin/users' }] : []),
+        // ...(user?.role === 'Admin' ? [{ label: 'مدیریت کالا', path: '/admin/products' }] : []),
         ...(user?.role === 'Admin' ? [{ label: 'مدیریت آیتم‌های فروش', path: '/admin/sale-items' }] : []),
     ]
 
