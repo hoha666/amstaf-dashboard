@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         remotePatterns: [
             {
                 protocol: "https",
+                hostname: "c22b61ac608c1d723c76589756c693b1.r2.cloudflarestorage.com",
+                pathname: "/product-media/**",
+            },
+            {
+                protocol: "https",
                 hostname: "minio.qa.amstaf.ir",
                 pathname: "/product-media/**",
             },
