@@ -29,6 +29,10 @@ const COLOR_OPTIONS = [
     {label: "بژ", value: "Beige"},
     {label: "خاکستری", value: "Gray"},
     {label: "قهوه‌ای", value: "Brown"},
+    {label: "عاجی", value: "Ivory"},
+    {label: "کرمی", value: "Cream"},
+    {label: "وانيلي", value: "Vanilla"},
+    {label: "شامپاینی", value: "Champagne"},
 ] as const;
 
 const getColorLabel = (v?: string) =>
